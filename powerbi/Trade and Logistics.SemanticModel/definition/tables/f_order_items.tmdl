@@ -1,0 +1,111 @@
+table f_order_items
+	lineageTag: a613f47d-f556-44b6-89cc-922b14c1e4e5
+
+	column order_id
+		dataType: string
+		lineageTag: a73fa851-4a0a-4798-8561-aa91495e05ff
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_item_id
+		dataType: int64
+		formatString: 0
+		lineageTag: e127f9d6-1390-414c-b1bd-e8e4e465a7ce
+		summarizeBy: sum
+		sourceColumn: order_item_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_id
+		dataType: string
+		lineageTag: 51fd20ac-5c72-437f-b599-b3de078a9f0d
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column seller_id
+		dataType: string
+		lineageTag: 213197a3-7456-4a03-ba1f-722922999d22
+		summarizeBy: none
+		sourceColumn: seller_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column shipping_limit_date
+		dataType: dateTime
+		formatString: dd.mm.yyyy
+		lineageTag: 58922e61-fd26-42f5-9bc8-a35774dedd16
+		summarizeBy: none
+		sourceColumn: shipping_limit_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column price
+		dataType: double
+		lineageTag: 4b67d8ff-26dc-4625-bca0-dafc36349162
+		summarizeBy: sum
+		sourceColumn: price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column freight_value
+		dataType: double
+		formatString: "€"\ #,0;-"€"\ #,0;"€"\ #,0
+		lineageTag: ed0dbff6-ba57-4fa3-be14-5101aa691442
+		summarizeBy: sum
+		sourceColumn: freight_value
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_id
+		dataType: string
+		lineageTag: 53257333-8ed8-4c40-a1b2-5bc6c003ac40
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column Payments
+		dataType: double
+		lineageTag: ad67e882-61e7-40c6-a32b-9a49e172f25e
+		summarizeBy: sum
+		sourceColumn: Payments
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition f_order_items = m
+		mode: import
+		queryGroup: Active
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\49151\OneDrive\Курс IT\Power BI\Project\Project-20241011T133917Z-001\Project\olist_order_items_dataset.csv"),[Delimiter=",", Columns=7, Encoding=1251, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"order_id", type text}, {"order_item_id", Int64.Type}, {"product_id", type text}, {"seller_id", type text}, {"shipping_limit_date", type datetime}, {"price", type text}, {"freight_value", type text}}),
+				    #"Replaced Value" = Table.ReplaceValue(#"Changed Type",".",",",Replacer.ReplaceText,{"price", "freight_value"}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Replaced Value",{{"price", type number}, {"freight_value", type number}}),
+				    #"Reordered Columns" = Table.ReorderColumns(#"Changed Type1",{"order_id", "product_id", "seller_id", "shipping_limit_date", "price", "freight_value", "order_item_id"}),
+				    #"Changed Type2" = Table.TransformColumnTypes(#"Reordered Columns",{{"shipping_limit_date", type date}}),
+				    #"Merged Queries" = Table.NestedJoin(#"Changed Type2", {"order_id"}, d_orders, {"order_id"}, "d_orders", JoinKind.LeftOuter),
+				    #"Expanded d_orders" = Table.ExpandTableColumn(#"Merged Queries", "d_orders", {"customer_id"}, {"d_orders.customer_id"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Expanded d_orders",{{"d_orders.customer_id", "customer_id"}}),
+				    #"Reordered Columns1" = Table.ReorderColumns(#"Renamed Columns",{"order_id", "product_id", "customer_id", "seller_id", "shipping_limit_date", "price", "freight_value", "order_item_id"}),
+				    #"Added Custom" = Table.AddColumn(#"Reordered Columns1", "Payments", each [price] + [freight_value]),
+				    #"Changed Type3" = Table.TransformColumnTypes(#"Added Custom",{{"Payments", type number}})
+				in
+				    #"Changed Type3"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

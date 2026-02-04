@@ -1,0 +1,108 @@
+expression product_category_name_translation =
+		let
+		    Source = Csv.Document(File.Contents("C:\Users\49151\OneDrive\Курс IT\Power BI\Project\Project-20241011T133917Z-001\Project\product_category_name_translation.csv"),[Delimiter=",", Columns=2, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+		    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}, {"Column2", type text}}),
+		    #"Promoted Headers" = Table.PromoteHeaders(#"Changed Type", [PromoteAllScalars=true]),
+		    #"Changed Type1" = Table.TransformColumnTypes(#"Promoted Headers",{{"product_category_name", type text}, {"product_category_name_english", type text}})
+		in
+		    #"Changed Type1"
+	lineageTag: 5e205471-de6a-45a4-8d2f-dc64b1ba08de
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression 'f_olist_order_items_dataset (3)' =
+		let
+		    Source = Csv.Document(File.Contents("C:\Users\49151\OneDrive\Курс IT\Power BI\Project\Project-20241011T133917Z-001\Project\olist_order_items_dataset.csv"),[Delimiter=",", Columns=7, Encoding=1251, QuoteStyle=QuoteStyle.None]),
+		    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+		    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"order_id", type text}, {"order_item_id", Int64.Type}, {"product_id", type text}, {"seller_id", type text}, {"shipping_limit_date", type datetime}, {"price", type text}, {"freight_value", type text}}),
+		    #"Replaced Value" = Table.ReplaceValue(#"Changed Type",".",",",Replacer.ReplaceText,{"price", "freight_value"}),
+		    #"Changed Type1" = Table.TransformColumnTypes(#"Replaced Value",{{"price", type number}, {"freight_value", type number}}),
+		    #"Reordered Columns" = Table.ReorderColumns(#"Changed Type1",{"order_id", "product_id", "seller_id", "shipping_limit_date", "price", "freight_value", "order_item_id"}),
+		    #"Grouped Rows" = Table.Group(#"Reordered Columns", {"order_id"}, {{"freight_value", each List.Sum([freight_value]), type nullable number}})
+		in
+		    #"Grouped Rows"
+	lineageTag: 42f91d9d-30b6-43a2-8ad0-92be9c42c932
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression 'f_olist_order_items_dataset (2)' =
+		let
+		    Source = Csv.Document(File.Contents("C:\Users\49151\OneDrive\Курс IT\Power BI\Project\Project-20241011T133917Z-001\Project\olist_order_items_dataset.csv"),[Delimiter=",", Columns=7, Encoding=1251, QuoteStyle=QuoteStyle.None]),
+		    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+		    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"order_id", type text}, {"order_item_id", Int64.Type}, {"product_id", type text}, {"seller_id", type text}, {"shipping_limit_date", type datetime}, {"price", type text}, {"freight_value", type text}}),
+		    #"Replaced Value" = Table.ReplaceValue(#"Changed Type",".",",",Replacer.ReplaceText,{"price", "freight_value"}),
+		    #"Changed Type1" = Table.TransformColumnTypes(#"Replaced Value",{{"price", type number}, {"freight_value", type number}}),
+		    #"Reordered Columns" = Table.ReorderColumns(#"Changed Type1",{"order_id", "product_id", "seller_id", "shipping_limit_date", "price", "freight_value", "order_item_id"}),
+		    #"Grouped Rows" = Table.Group(#"Reordered Columns", {"order_id"}, {{"Price", each List.Sum([price]), type nullable number}})
+		in
+		    #"Grouped Rows"
+	lineageTag: a80b4807-f30b-4922-aa3b-ed2612152031
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression olist_geolocation_dataset =
+		let
+		    Source = Csv.Document(File.Contents("C:\Users\49151\OneDrive\Курс IT\Power BI\Project\Project-20241011T133917Z-001\Project\olist_geolocation_dataset.csv"),[Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+		    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+		    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"geolocation_zip_code_prefix", Int64.Type}, {"geolocation_lat", type text}, {"geolocation_lng", type text}, {"geolocation_city", type text}, {"geolocation_state", type text}}),
+		    #"Removed Duplicates" = Table.Distinct(#"Changed Type", {"geolocation_zip_code_prefix"}),
+		    #"Replaced Value" = Table.ReplaceValue(#"Removed Duplicates","ã","a",Replacer.ReplaceText,{"geolocation_city"}),
+		    #"Replaced Value1" = Table.ReplaceValue(#"Replaced Value","á","a",Replacer.ReplaceText,{"geolocation_city"}),
+		    #"Replaced Value2" = Table.ReplaceValue(#"Replaced Value1","í","i",Replacer.ReplaceText,{"geolocation_city"}),
+		    #"Replaced Value3" = Table.ReplaceValue(#"Replaced Value2","ó","o",Replacer.ReplaceText,{"geolocation_city"}),
+		    #"Replaced Value4" = Table.ReplaceValue(#"Replaced Value3","é","e",Replacer.ReplaceText,{"geolocation_city"}),
+		    #"Replaced Value5" = Table.ReplaceValue(#"Replaced Value4","ç","c",Replacer.ReplaceText,{"geolocation_city"}),
+		    #"Replaced Value6" = Table.ReplaceValue(#"Replaced Value5","d'oeste","d oeste",Replacer.ReplaceText,{"geolocation_city"}),
+		    #"Replaced Value7" = Table.ReplaceValue(#"Replaced Value6","â","a",Replacer.ReplaceText,{"geolocation_city"}),
+		    #"Replaced Value8" = Table.ReplaceValue(#"Replaced Value7","varre-sai","varre sai",Replacer.ReplaceText,{"geolocation_city"}),
+		    #"Removed Duplicates1" = Table.Distinct(#"Replaced Value8", {"geolocation_city"}),
+		    #"Replaced Value9" = Table.ReplaceValue(#"Removed Duplicates1","biritiba-mirim","biritiba mirim",Replacer.ReplaceText,{"geolocation_city"}),
+		    #"Replaced Value10" = Table.ReplaceValue(#"Replaced Value9","ü","u",Replacer.ReplaceText,{"geolocation_city"}),
+		    #"Replaced Value11" = Table.ReplaceValue(#"Replaced Value10","ú","u",Replacer.ReplaceText,{"geolocation_city"}),
+		    #"Replaced Value12" = Table.ReplaceValue(#"Replaced Value11","d'","d ",Replacer.ReplaceText,{"geolocation_city"}),
+		    #"Replaced Value13" = Table.ReplaceValue(#"Replaced Value12","rio de janeiro, rio de janeiro, brasil","rio de janeiro",Replacer.ReplaceText,{"geolocation_city"}),
+		    #"Removed Duplicates2" = Table.Distinct(#"Replaced Value13", {"geolocation_city"})
+		in
+		    #"Removed Duplicates2"
+	lineageTag: 727fc966-393c-4d4f-a141-a52b82b29957
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression d_order_payments(2) =
+		let
+		    Source = Csv.Document(File.Contents("C:\Users\49151\OneDrive\Курс IT\Power BI\Project\Project-20241011T133917Z-001\Project\olist_order_payments_dataset.csv"),[Delimiter=",", Columns=5, Encoding=1251, QuoteStyle=QuoteStyle.None]),
+		    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+		    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"order_id", type text}, {"payment_sequential", Int64.Type}, {"payment_type", type text}, {"payment_installments", Int64.Type}, {"payment_value", type text}}),
+		    #"Replaced Value" = Table.ReplaceValue(#"Changed Type",".",",",Replacer.ReplaceText,{"payment_value"}),
+		    #"Changed Type1" = Table.TransformColumnTypes(#"Replaced Value",{{"payment_value", type number}}),
+		    #"Filtered Rows" = Table.SelectRows(#"Changed Type1", each true),
+		    #"Removed Columns" = Table.RemoveColumns(#"Filtered Rows",{"payment_sequential", "payment_installments"}),
+		    #"Grouped Rows" = Table.Group(#"Removed Columns", {"order_id"}, {{"Count", each List.Sum([payment_value]), type nullable number}}),
+		    #"Renamed Columns" = Table.RenameColumns(#"Grouped Rows",{{"Count", "order_payment"}}),
+		    #"Merged Queries" = Table.NestedJoin(#"Renamed Columns", {"order_id"}, d_orders, {"order_id"}, "d_olist_orders_dataset", JoinKind.LeftOuter),
+		    #"Expanded d_olist_orders_dataset" = Table.ExpandTableColumn(#"Merged Queries", "d_olist_orders_dataset", {"order_status"}, {"d_olist_orders_dataset.order_status"}),
+		    #"Renamed Columns1" = Table.RenameColumns(#"Expanded d_olist_orders_dataset",{{"d_olist_orders_dataset.order_status", "order_status"}}),
+		    #"Merged Queries1" = Table.NestedJoin(#"Renamed Columns1", {"order_id"}, #"f_olist_order_items_dataset (2)", {"order_id"}, "f_olist_order_items_dataset (2)", JoinKind.LeftOuter),
+		    #"Expanded f_olist_order_items_dataset (2)" = Table.ExpandTableColumn(#"Merged Queries1", "f_olist_order_items_dataset (2)", {"Price"}, {"f_olist_order_items_dataset (2).Price"}),
+		    #"Renamed Columns2" = Table.RenameColumns(#"Expanded f_olist_order_items_dataset (2)",{{"f_olist_order_items_dataset (2).Price", "Price"}}),
+		    #"Merged Queries2" = Table.NestedJoin(#"Renamed Columns2", {"order_id"}, #"f_olist_order_items_dataset (3)", {"order_id"}, "f_olist_order_items_dataset (3)", JoinKind.LeftOuter),
+		    #"Expanded f_olist_order_items_dataset (3)" = Table.ExpandTableColumn(#"Merged Queries2", "f_olist_order_items_dataset (3)", {"freight_value"}, {"f_olist_order_items_dataset (3).freight_value"}),
+		    #"Renamed Columns3" = Table.RenameColumns(#"Expanded f_olist_order_items_dataset (3)",{{"f_olist_order_items_dataset (3).freight_value", "freight_value"}}),
+		    #"Added Custom" = Table.AddColumn(#"Renamed Columns3", "Custom", each [Price]+[freight_value]),
+		    #"Removed Columns1" = Table.RemoveColumns(#"Added Custom",{"Custom"})
+		in
+		    #"Removed Columns1"
+	lineageTag: 245d08aa-44fc-4354-9a5b-e79017a689c2
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

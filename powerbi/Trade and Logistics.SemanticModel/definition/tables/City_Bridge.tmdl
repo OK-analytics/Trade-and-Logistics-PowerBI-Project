@@ -1,0 +1,29 @@
+table City_Bridge
+	lineageTag: 3f9dc3e1-7164-4be1-ba2f-f028802c1de9
+
+	column Сustomer_city
+		lineageTag: 8d23dd2d-e98a-4034-8447-2cacafc4929e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: d_customers[Сustomer_city]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition City_Bridge = calculated
+		mode: import
+		source =
+				
+				VAR CombinedCities =
+				        UNION(
+				    VALUES(d_customers[Сustomer_city]),
+				    VALUES(d_order_reviews[Сustomer_city])
+				            )
+				    RETURN
+				        FILTER(
+				            DISTINCT(CombinedCities),
+				            NOT(ISBLANK([Сustomer_city]))
+				            && [Сustomer_city] <>""
+				            )
+
+	annotation PBI_Id = 8ee3b0b181db42c8926471c22ecdd6e6
+

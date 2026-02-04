@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Trade and Logistics"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "ee6e4c98-522e-4cf3-9baa-de709a56f6db"
+  }
+}

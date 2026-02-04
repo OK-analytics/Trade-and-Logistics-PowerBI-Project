@@ -1,0 +1,88 @@
+table d_sellers
+	lineageTag: f1c9d524-ef05-4857-8813-ad999731396e
+
+	column seller_id
+		dataType: string
+		lineageTag: f7f9408d-8d95-4db0-8a77-6e26178d492d
+		summarizeBy: none
+		sourceColumn: seller_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column seller_zip_code_prefix
+		dataType: int64
+		formatString: 0
+		lineageTag: ce95cb61-3f2d-4be0-b087-5204452b565d
+		summarizeBy: none
+		sourceColumn: seller_zip_code_prefix
+
+		annotation SummarizationSetBy = Automatic
+
+	column seller_city
+		dataType: string
+		lineageTag: 800fac36-1f0b-4911-94c0-af37f4b16d86
+		summarizeBy: none
+		sourceColumn: seller_city
+
+		annotation SummarizationSetBy = Automatic
+
+	column seller_state
+		dataType: string
+		lineageTag: b5999592-f4f2-4cd4-9606-df4505997d0e
+		summarizeBy: none
+		sourceColumn: seller_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column geolocation_lat
+		dataType: double
+		lineageTag: fc0d36d3-0095-4351-ae97-09bcf6b18799
+		summarizeBy: none
+		sourceColumn: geolocation_lat
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column geolocation_lng
+		dataType: double
+		lineageTag: 84aea20a-28d7-4488-9538-5eb63649a1b3
+		summarizeBy: none
+		sourceColumn: geolocation_lng
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition d_sellers = m
+		mode: import
+		queryGroup: Active
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\49151\OneDrive\Курс IT\Power BI\Project\Project-20241011T133917Z-001\Project\olist_sellers_dataset.csv"),[Delimiter=",", Columns=4, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"seller_id", type text}, {"seller_zip_code_prefix", Int64.Type}, {"seller_city", type text}, {"seller_state", type text}}),
+				    #"Merged Queries" = Table.NestedJoin(#"Changed Type", {"seller_zip_code_prefix", "seller_state"}, olist_geolocation_dataset, {"geolocation_zip_code_prefix", "geolocation_state"}, "olist_geolocation_dataset", JoinKind.LeftOuter),
+				    #"Expanded olist_geolocation_dataset" = Table.ExpandTableColumn(#"Merged Queries", "olist_geolocation_dataset", {"geolocation_lat", "geolocation_lng"}, {"olist_geolocation_dataset.geolocation_lat", "olist_geolocation_dataset.geolocation_lng"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Expanded olist_geolocation_dataset",{{"olist_geolocation_dataset.geolocation_lat", "geolocation_lat"}, {"olist_geolocation_dataset.geolocation_lng", "geolocation_lng"}}),
+				    #"Replaced Value" = Table.ReplaceValue(#"Renamed Columns",".",",",Replacer.ReplaceText,{"geolocation_lat", "geolocation_lng"}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Replaced Value",{{"geolocation_lat", type number}, {"geolocation_lng", type number}}),
+				    #"Replaced Value1" = Table.ReplaceValue(#"Changed Type1","mogi das cruzes / sp","mogi das cruzes",Replacer.ReplaceText,{"seller_city"}),
+				    #"Replaced Value2" = Table.ReplaceValue(#"Replaced Value1","d´","d ",Replacer.ReplaceText,{"seller_city"}),
+				    #"Replaced Value3" = Table.ReplaceValue(#"Replaced Value2","sao sebastiao da grama/sp","sao sebastiao da grama",Replacer.ReplaceText,{"seller_city"}),
+				    #"Replaced Value4" = Table.ReplaceValue(#"Replaced Value3","auriflama/sp","auriflama",Replacer.ReplaceText,{"seller_city"}),
+				    #"Replaced Value5" = Table.ReplaceValue(#"Replaced Value4","sao paulo / sao paulo","sao paulo",Replacer.ReplaceText,{"seller_city"}),
+				    #"Replaced Value6" = Table.ReplaceValue(#"Replaced Value5","santo andre/sao paulo","santo andre",Replacer.ReplaceText,{"seller_city"}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Replaced Value6",{"geolocation_lat", "geolocation_lng"}),
+				    #"Merged Queries1" = Table.NestedJoin(#"Removed Columns", {"seller_city"}, olist_geolocation_dataset, {"geolocation_city"}, "olist_geolocation_dataset", JoinKind.LeftOuter),
+				    #"Expanded olist_geolocation_dataset1" = Table.ExpandTableColumn(#"Merged Queries1", "olist_geolocation_dataset", {"geolocation_lat", "geolocation_lng"}, {"olist_geolocation_dataset.geolocation_lat", "olist_geolocation_dataset.geolocation_lng"}),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Expanded olist_geolocation_dataset1",{{"olist_geolocation_dataset.geolocation_lat", "geolocation_lat"}, {"olist_geolocation_dataset.geolocation_lng", "geolocation_lng"}}),
+				    #"Replaced Value7" = Table.ReplaceValue(#"Renamed Columns1",".",",",Replacer.ReplaceText,{"geolocation_lat", "geolocation_lng"}),
+				    #"Changed Type2" = Table.TransformColumnTypes(#"Replaced Value7",{{"geolocation_lat", type number}, {"geolocation_lng", type number}})
+				in
+				    #"Changed Type2"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

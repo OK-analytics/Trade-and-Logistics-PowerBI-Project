@@ -1,0 +1,85 @@
+table d_customers
+	lineageTag: 65a13340-953a-4a27-a194-4217f038cf0b
+
+	column customer_id
+		dataType: string
+		lineageTag: 3cd82177-2fdb-4e8b-af4f-ed977dc43139
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_zip_code_prefix
+		dataType: int64
+		formatString: 0
+		lineageTag: 1d4736bc-3070-4df9-bc1d-8d72216e4bbd
+		summarizeBy: sum
+		sourceColumn: customer_zip_code_prefix
+
+		annotation SummarizationSetBy = Automatic
+
+	column Сustomer_city
+		dataType: string
+		lineageTag: 73163439-9303-45f5-83d6-48c78e1c67dc
+		summarizeBy: none
+		sourceColumn: Сustomer_city
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_state
+		dataType: string
+		lineageTag: d8b428ee-511b-46e7-9db5-99b3b52f492f
+		summarizeBy: none
+		sourceColumn: customer_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column geolocation_lat
+		dataType: double
+		lineageTag: cead5083-bfa4-4433-85dd-eb99091e0226
+		summarizeBy: sum
+		sourceColumn: geolocation_lat
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column geolocation_lng
+		dataType: double
+		lineageTag: 1c473134-d65c-40b1-89e4-2cb3386598de
+		summarizeBy: sum
+		sourceColumn: geolocation_lng
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition d_customers = m
+		mode: import
+		queryGroup: Active
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\49151\OneDrive\Курс IT\Power BI\Project\Project-20241011T133917Z-001\Project\olist_customers_dataset.csv"),[Delimiter=",", Columns=5, Encoding=1251, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"customer_id", type text}, {"customer_unique_id", type text}, {"customer_zip_code_prefix", Int64.Type}, {"customer_city", type text}, {"customer_state", type text}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"customer_unique_id"}),
+				    #"Merged Queries" = Table.NestedJoin(#"Removed Columns", {"customer_zip_code_prefix"}, olist_geolocation_dataset, {"geolocation_zip_code_prefix"}, "olist_geolocation_dataset", JoinKind.LeftOuter),
+				    #"Expanded olist_geolocation_dataset" = Table.ExpandTableColumn(#"Merged Queries", "olist_geolocation_dataset", {"geolocation_lat", "geolocation_lng"}, {"olist_geolocation_dataset.geolocation_lat", "olist_geolocation_dataset.geolocation_lng"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Expanded olist_geolocation_dataset",{{"olist_geolocation_dataset.geolocation_lat", "geolocation_lat"}, {"olist_geolocation_dataset.geolocation_lng", "geolocation_lng"}}),
+				    #"Replaced Value" = Table.ReplaceValue(#"Renamed Columns",".",",",Replacer.ReplaceText,{"geolocation_lat", "geolocation_lng"}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Replaced Value",{{"geolocation_lat", type number}, {"geolocation_lng", type number}}),
+				    #"Replaced Value1" = Table.ReplaceValue(#"Changed Type1","d'","d ",Replacer.ReplaceText,{"customer_city"}),
+				    #"Removed Columns1" = Table.RemoveColumns(#"Replaced Value1",{"geolocation_lat", "geolocation_lng"}),
+				    #"Merged Queries1" = Table.NestedJoin(#"Removed Columns1", {"customer_city"}, olist_geolocation_dataset, {"geolocation_city"}, "olist_geolocation_dataset", JoinKind.LeftOuter),
+				    #"Expanded olist_geolocation_dataset1" = Table.ExpandTableColumn(#"Merged Queries1", "olist_geolocation_dataset", {"geolocation_lat", "geolocation_lng"}, {"olist_geolocation_dataset.geolocation_lat", "olist_geolocation_dataset.geolocation_lng"}),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Expanded olist_geolocation_dataset1",{{"olist_geolocation_dataset.geolocation_lat", "geolocation_lat"}, {"olist_geolocation_dataset.geolocation_lng", "geolocation_lng"}}),
+				    #"Replaced Value2" = Table.ReplaceValue(#"Renamed Columns1",".",",",Replacer.ReplaceText,{"geolocation_lat", "geolocation_lng"}),
+				    #"Changed Type2" = Table.TransformColumnTypes(#"Replaced Value2",{{"geolocation_lat", type number}, {"geolocation_lng", type number}}),
+				    #"Renamed Columns2" = Table.RenameColumns(#"Changed Type2",{{"customer_city", "Сustomer_city"}})
+				in
+				    #"Renamed Columns2"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

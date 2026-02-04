@@ -1,0 +1,48 @@
+table select_reviews
+	lineageTag: 455798da-ad32-49a1-a6a4-04f2e277ff4e
+
+	column select_reviews
+		lineageTag: 27d69bc8-1cfc-4467-983e-e57d31c567b4
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'select_reviews Order'
+
+		relatedColumnDetails
+			groupByColumn: 'select_reviews Fields'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'select_reviews Fields'
+		isHidden
+		lineageTag: db279f7c-2f66-4181-8163-d0186e58a4a6
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'select_reviews Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'select_reviews Order'
+		isHidden
+		formatString: 0
+		lineageTag: 68760f20-9f09-4e95-9f00-a0b8a0c67bb0
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition select_reviews = calculated
+		mode: import
+		source =
+				{
+				    ("Average Review score", NAMEOF('_m'[Average Review score]), 0),
+				    ("Feedback response time", NAMEOF('_m'[Feedback response time]), 1)
+				}
+
+	annotation PBI_Id = 69522d818ad645839684428580256e92
+

@@ -1,0 +1,53 @@
+table Select_value
+	lineageTag: 8a0df2a5-2853-4609-8129-2232cb5c972d
+
+	column Select_value
+		lineageTag: ea33181a-dbd5-40b5-807c-aa65ed84bffc
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Select_value Order'
+
+		relatedColumnDetails
+			groupByColumn: 'Select_value Fields'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Select_value Fields'
+		isHidden
+		lineageTag: 40674db3-afd4-45a4-814a-f0a5338b4b80
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Select_value Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation __PBI_SemanticLinks = [{"LinkTarget":{"TableName":"d_products","TableItemName":"Category (clusters)","ObjectType":4},"LinkType":"UsedInGroup"}]
+
+	column 'Select_value Order'
+		isHidden
+		formatString: 0
+		lineageTag: c241ef6c-8336-43f9-aa33-047e674b8bef
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Select_value = calculated
+		mode: import
+		source =
+				{
+				    ("Sales", NAMEOF('_m'[Sales]), 1),
+				    ("Revenue", NAMEOF('_m'[Revenue]), 1),
+				    ("Gross Merchandise Value", NAMEOF('_m'[Gross Merchandise Value]), 2)
+				}
+
+	annotation PBI_Id = b3feaaad7df345bd9965988587c9c57c
+
+	annotation __PBI_SemanticLinks = [{"LinkTarget":{"TableName":"d_products","TableItemName":"Category (clusters)","ObjectType":4},"LinkType":"UsedInGroup"}]
+

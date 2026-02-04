@@ -1,0 +1,101 @@
+table PoorReviews
+	lineageTag: 8ef17691-768e-4372-bd39-c79088f1fbb2
+
+	column review_id
+		lineageTag: 8d4bb5e2-7b50-414e-a1fe-56d7ffaa7214
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: d_order_reviews[review_id]
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_id
+		lineageTag: b9524b8a-4545-43ae-92be-d1d1c1fd426a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: d_order_reviews[order_id]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Poor rating'
+		formatString: 0
+		lineageTag: 8e2d5f6f-a661-4a42-bf98-62cb800c7d7d
+		summarizeBy: sum
+		sourceColumn: d_order_reviews[review_score]
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_creation_date
+		formatString: General Date
+		lineageTag: 4b5758b1-51cc-4059-886d-698557272683
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: d_order_reviews[review_creation_date]
+
+		variation Variation
+			isDefault
+			relationship: 1605944d-f092-4e00-90dd-9a21a727d2df
+			defaultHierarchy: LocalDateTable_f6ec3a38-56eb-429e-95c1-2605c3134412.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_answer_timestamp
+		formatString: General Date
+		lineageTag: 9bc40590-0441-4112-bdc2-a67cc35ed582
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: d_order_reviews[review_answer_timestamp]
+
+		variation Variation
+			isDefault
+			relationship: 2cc8f7c1-83a3-437e-a28a-9610ac73e49f
+			defaultHierarchy: LocalDateTable_71d99c37-9308-43f6-a4be-6db0476dab3b.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'response_time (d)'
+		formatString: 0
+		lineageTag: 437ea6fd-be21-4ef8-882a-4000a83600b4
+		summarizeBy: sum
+		sourceColumn: d_order_reviews[response_time]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer ratings'
+		lineageTag: 9107326e-bbd4-43f5-9bd4-4315e2e4b1a9
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: d_order_reviews[Customer ratings]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'd_orders.customer_id'
+		lineageTag: 8cd6c3e1-4b37-4c0c-82f2-0c88e561f2d7
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: d_order_reviews[d_orders.customer_id]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Сustomer_city
+		lineageTag: 6719c6f6-4ab3-444a-a5e5-d761281be40c
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: d_order_reviews[Сustomer_city]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition PoorReviews = calculated
+		mode: import
+		source =
+				
+				CALCULATETABLE(
+				    FILTER(
+				        'd_order_reviews',
+				        'd_order_reviews'[review_score] = 2
+				    ),
+				    ALL('d_order_reviews')
+				)
+
+	annotation PBI_Id = 09da33ff75f649acb88aaf012ada8d51
+

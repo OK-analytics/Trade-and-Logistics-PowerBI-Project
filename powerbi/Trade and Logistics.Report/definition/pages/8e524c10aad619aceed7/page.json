@@ -1,0 +1,90 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.0.0/schema.json",
+  "name": "8e524c10aad619aceed7",
+  "displayName": "Logistics",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
+  "objects": {
+    "outspace": [
+      {
+        "properties": {
+          "image": {
+            "image": {
+              "name": {
+                "expr": {
+                  "Literal": {
+                    "Value": "''"
+                  }
+                }
+              },
+              "url": {
+                "expr": {
+                  "Literal": {
+                    "Value": "''"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "border": {
+            "expr": {
+              "Literal": {
+                "Value": "true"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "filterCard": [
+      {
+        "properties": {
+          "border": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        },
+        "selector": {
+          "id": "Available"
+        }
+      }
+    ]
+  },
+  "visualInteractions": [
+    {
+      "source": "840e2cf8cb9603a0d891",
+      "target": "0bd8464860d067eca17a",
+      "type": "DataFilter"
+    },
+    {
+      "source": "840e2cf8cb9603a0d891",
+      "target": "13e0620e0dd0c2764640",
+      "type": "DataFilter"
+    },
+    {
+      "source": "840e2cf8cb9603a0d891",
+      "target": "efa1080f007a33dae8ea",
+      "type": "DataFilter"
+    },
+    {
+      "source": "840e2cf8cb9603a0d891",
+      "target": "a9254b0052d9451e23d6",
+      "type": "DataFilter"
+    },
+    {
+      "source": "13e0620e0dd0c2764640",
+      "target": "0bd8464860d067eca17a",
+      "type": "DataFilter"
+    }
+  ]
+}

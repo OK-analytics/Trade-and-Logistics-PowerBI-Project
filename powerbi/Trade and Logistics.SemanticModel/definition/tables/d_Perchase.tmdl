@@ -1,0 +1,59 @@
+table d_Perchase
+	lineageTag: 6b1a5988-45ad-4aae-a9b9-7a33ca6bf587
+
+	column order_id
+		dataType: string
+		lineageTag: bb085b34-5f8a-4895-9e8f-0d4f8d5655cf
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_id
+		dataType: string
+		lineageTag: 98ef1402-53b6-403d-a588-1400e58f36cc
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_status
+		dataType: string
+		lineageTag: 7b01b2bb-f23c-4f05-8fc0-00f5a9d6a104
+		summarizeBy: none
+		sourceColumn: order_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_purchase_timestamp
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: e2c00d9a-95ba-4bcc-b0fe-c851a731f2ed
+		summarizeBy: none
+		sourceColumn: order_purchase_timestamp
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition d_Perchase = m
+		mode: import
+		queryGroup: Funnel
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\49151\OneDrive\Курс IT\Power BI\Project\Project-20241011T133917Z-001\Project\olist_orders_dataset.csv"),[Delimiter=",", Columns=8, Encoding=1251, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"order_id", type text}, {"customer_id", type text}, {"order_status", type text}, {"order_purchase_timestamp", type datetime}, {"order_approved_at", type datetime}, {"order_delivered_carrier_date", type datetime}, {"order_delivered_customer_date", type datetime}, {"order_estimated_delivery_date", type datetime}}),
+				    #"Sorted Rows" = Table.Sort(#"Changed Type",{{"order_purchase_timestamp", Order.Descending}}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Sorted Rows",{{"order_purchase_timestamp", type date}}),
+				    #"Sorted Rows1" = Table.Sort(#"Changed Type1",{{"order_purchase_timestamp", Order.Ascending}}),
+				    #"Changed Type2" = Table.TransformColumnTypes(#"Sorted Rows1",{{"order_approved_at", type date}, {"order_delivered_carrier_date", type date}, {"order_delivered_customer_date", type date}, {"order_estimated_delivery_date", type date}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type2",{"order_delivered_carrier_date", "order_delivered_customer_date", "order_estimated_delivery_date", "order_approved_at"}),
+				    #"Filtered Rows" = Table.SelectRows(#"Removed Columns", each [order_purchase_timestamp] <> null and [order_purchase_timestamp] <> "")
+				in
+				    #"Filtered Rows"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

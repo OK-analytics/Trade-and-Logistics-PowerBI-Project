@@ -1,0 +1,307 @@
+table _m
+	lineageTag: 0713ad5a-450f-445b-b550-c59a9d0c1db0
+
+	measure 'Average check' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('d_orders'[order_id])),
+				CALCULATE(SUM('f_order_items'[price]))
+			)
+		formatString: "€"\ #,0;-"€"\ #,0;"€"\ #,0
+		lineageTag: 672ff546-e801-43d3-a616-427cf13bafb7
+
+	measure Revenue =
+			CALCULATE(
+			    SUMX(
+			        'f_order_items',
+			        'f_order_items'[Payments]
+			    ),
+			    d_orders[order_status] = "delivered"
+			)
+		formatString: 0
+		lineageTag: eac901ec-6021-4a3c-9f8e-be17f76aef79
+
+	measure 'Sum deals in work' = ```
+			CALCULATE(
+			    SUM('f_order_items'[Payments]), d_orders[order_status] IN {"approved", "created", "invoiced", "processing", "shipped"}
+			) 
+			```
+		formatString: "€"\ #,0;-"€"\ #,0;"€"\ #,0
+		lineageTag: bf83858f-7638-4787-b78d-cc2e8837aaae
+
+	measure Leads = ```
+			CALCULATE(
+			    COUNTA('d_order_payments'[order_id]), d_orders[order_status] IN {"created", "invoiced", "processing"}
+			) 
+			```
+		formatString: 0
+		lineageTag: 0f14d2e3-bb7f-4e42-8881-3fcbf389c9ca
+
+	measure Sales = ```
+			
+			VAR SelectedOrders =
+			VALUES(f_order_items[order_id])
+			RETURN
+			CALCULATE(
+			    DISTINCTCOUNT('d_order_payments'[order_id]), 
+			  KEEPFILTERS(  
+			    d_orders[order_status] = "delivered"),
+			    TREATAS(SelectedOrders,
+			    d_order_payments[order_id]),
+			    TREATAS(VALUES('Calendar'[Date]),
+			    d_orders[order_delivered_customer_date])
+			)
+			
+			```
+		formatString: 0
+		lineageTag: bd102ba5-7d8d-4fa3-bf82-8f7cfd5af2dd
+
+	measure 'Active customer base' =
+			CALCULATE(
+			    DISTINCTCOUNT(d_orders[customer_id]), d_orders[order_status] = "delivered")
+		formatString: #,0
+		lineageTag: fb04cbbf-7039-4c1b-80f1-34ab38f8587d
+
+	measure 'On Time Deliveries' = ```
+			CALCULATE(
+			    COUNTROWS(d_orders), d_orders[order_status] = "delivered", 
+			    KEEPFILTERS(d_orders[Delivery Status] = "On Time")
+			)
+			```
+		formatString: 0
+		lineageTag: d8e31442-ef62-4b2e-8e86-ff414e4952e5
+
+	measure 'On time delivery rate' =
+			CALCULATE(
+			    DIVIDE([On Time Deliveries], [Total Deliveries], 0)
+			)
+		formatString: 0%;-0%;0%
+		lineageTag: f790ce0b-1f8b-49b9-b918-5009f02495bc
+
+	measure 'Total Deliveries' =
+			CALCULATE(
+			    COUNTROWS(d_orders), d_orders[order_status] = "delivered")
+		formatString: 0
+		lineageTag: 327e3cc3-be59-44f0-b87c-1371068aef38
+
+	measure 'AVG freight value' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('f_order_items'[order_id])),
+				CALCULATE(SUM('f_order_items'[freight_value]))
+			)
+		formatString: "€"\ #,0;-"€"\ #,0;"€"\ #,0
+		lineageTag: 7b400b9a-1f7f-4b7c-8aea-a4251a2dd27b
+
+		extendedProperty MeasureTemplate =
+				{
+				  "version": 0,
+				  "daxTemplateName": "AveragePerCategory"
+				}
+
+		changedProperty = FormatString
+
+	measure 'price average per order_id' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('f_order_items'[order_id])),
+				CALCULATE(SUM('f_order_items'[price]))
+			)
+		lineageTag: 80d75858-b7e7-464d-bd9a-6baad13f3841
+
+		extendedProperty MeasureTemplate =
+				{
+				  "version": 0,
+				  "daxTemplateName": "AveragePerCategory"
+				}
+
+		changedProperty = FormatString
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'AVG processing time (h)' =
+			CALCULATE(
+			    AVERAGE(d_orders[Processing Time]), d_orders[order_status] in {"approved", "shipped", "delivered"}
+			)
+		formatString: #,0.0
+		lineageTag: 72f07e1f-ce43-428e-8123-037bd33cae14
+
+	measure 'AVG Order Cycle Time (d)' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('d_orders'[order_id])),
+				CALCULATE(SUM('d_orders'[Orders Cycle Time]))
+			)
+		formatString: 0
+		lineageTag: bc2282b1-c0fd-45f5-9c30-064434715317
+
+		extendedProperty MeasureTemplate =
+				{
+				  "version": 0,
+				  "daxTemplateName": "AveragePerCategory"
+				}
+
+		changedProperty = FormatString
+
+	measure Approved = COUNTA(d_Approved_orders[order_id])
+		formatString: #,0.0
+		lineageTag: bb324dfe-6bb3-4a52-a062-90d3166edf62
+
+	measure Ordered = COUNTA(d_Perchase[order_id])
+		formatString: 0
+		lineageTag: c1a3062f-05b0-4738-853d-1a9c08398d7b
+
+	measure Delivered = ```
+			CALCULATE(
+			    COUNTA(d_Delivered_orders[order_id]), d_Delivered_orders[order_status] <> "canceled")  
+			```
+		formatString: 0
+		lineageTag: cbe8668a-cee6-483a-8e43-47832f8701ca
+
+	measure Shipped = COUNTA(d_Shipped_orders[order_id])
+		formatString: 0
+		lineageTag: 014b62ae-cffa-4471-a9b5-681ea5b5db89
+
+	measure 'Gross Merchandise Value' =
+			CALCULATE(
+			    SUM('f_order_items'[price]), d_orders[order_status] = "delivered"
+			)
+		formatString: "€"\ #,0;-"€"\ #,0;"€"\ #,0
+		lineageTag: 980195ce-2aba-4106-84df-b7b1dda9d94c
+
+		annotation __PBI_SemanticLinks = [{"LinkTarget":{"TableName":"d_products","TableItemName":"Category (clusters)","ObjectType":4},"LinkType":"UsedInGroup"}]
+
+	measure 'Total Shipping Cost' =
+			CALCULATE(
+			    SUM('f_order_items'[freight_value]), d_orders[order_status] = "delivered"
+			)
+		formatString: #,0
+		lineageTag: 3113e857-680d-4254-aa5b-0e0718537361
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Quantity of Deliveries' =
+			CALCULATE(
+			    COUNTA('f_order_items'[order_id]), d_orders[order_status] = "delivered"
+			)
+		formatString: #,0
+		lineageTag: 776b7f86-84d6-4468-8484-a93501718a89
+
+	measure 'GMV LY' = ```
+			
+			CALCULATE([Gross Merchandise Value], 
+			    SAMEPERIODLASTYEAR('Calendar'[Date]))
+			```
+		lineageTag: d6724093-db2e-4beb-9059-93057618d724
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'GMV vs LY' = [Gross Merchandise Value] / [GMV LY] - 1
+		lineageTag: 59b1876f-4c8b-4b1e-8ebb-f2a29372e6d9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'GMV Gain' = ```
+			
+			DIVIDE(
+			    CALCULATE([Gross Merchandise Value]) - CALCULATE([Gross Merchandise Value], SAMEPERIODLASTYEAR('Calendar'[Date])), 
+			CALCULATE([Gross Merchandise Value], 
+			    SAMEPERIODLASTYEAR('Calendar'[Date])) 
+			)
+			
+			```
+		lineageTag: 48f1a157-3822-4fa9-98a7-a2bce93810ed
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'AVG Q orders per ship d.' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('d_orders'[order_delivered_customer_date])),
+				CALCULATE([Total Deliveries])
+			)
+		formatString: #,0
+		lineageTag: 255a332b-b480-4f79-916f-34e8191b7425
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Payment conversion' =
+			
+			VAR Result =
+			    DIVIDE([Shipped], [Ordered], 0)
+			    RETURN IF(Result > 1, 1, Result)
+		formatString: 0%;-0%;0%
+		lineageTag: 5ede1f3a-5e16-41d1-bd43-00e35cbd7462
+
+	measure 'Average Q of products in Order' = ```
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('f_order_items'[order_id])),
+				CALCULATE(COUNT('f_order_items'[product_id]))
+			)
+			
+			```
+		lineageTag: bd231a05-9db2-41d8-985a-8b0853de1cfa
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total payments' =
+			
+			CALCULATE(
+			    SUM('f_order_items'[Payments]), d_orders[order_status] IN {"approved", "shipped", "delivered"}
+			)
+		formatString: "€"\ #,0;-"€"\ #,0;"€"\ #,0
+		lineageTag: 9bc9918c-d6fd-4630-9554-a1d50524a29e
+
+	measure 'Amount of payments' =
+			
+			CALCULATE(
+			    DISTINCTCOUNT('d_order_payments'[order_id]), d_orders[order_status] IN {"approved", "shipped", "delivered"}
+			)
+		formatString: #,0
+		lineageTag: 6b9e15cc-4cbd-4d3a-9822-27e86720cef1
+
+	measure 'Feedback response time' =
+			
+			AVERAGEX(
+				KEEPFILTERS(VALUES('d_order_reviews'[order_id])),
+				CALCULATE(SUM('d_order_reviews'[response_time]))
+			)
+		formatString: #,0.0
+		lineageTag: 572e2c6d-2c51-4fb0-9c50-f2bef81b2eda
+
+	measure 'Average Review score' =
+			
+			CALCULATE(
+			    AVERAGE('d_order_reviews'[review_score]),
+			    KEEPFILTERS(VALUES('d_order_reviews'[review_score]))
+			)
+		lineageTag: 96d8917c-3964-474e-8fc3-bb5dbdb212c2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Negative Feedback Ratio' =
+			DIVIDE(
+			    COUNTROWS(FILTER(d_order_reviews, d_order_reviews[Customer ratings] IN {"Very Poor", "Poor"})),
+			    COUNTROWS(d_order_reviews)
+			)
+		formatString: #,0.0%;-#,0.0%;#,0.0%
+		lineageTag: f56eab78-3902-4b80-a52a-9af4053b0fe4
+
+	partition _m = m
+		mode: import
+		queryGroup: Active
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Column1"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation __PBI_SemanticLinks = [{"LinkTarget":{"TableName":"d_products","TableItemName":"Category (clusters)","ObjectType":4},"LinkType":"UsedInGroup"}]
+

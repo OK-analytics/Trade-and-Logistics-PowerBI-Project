@@ -1,0 +1,126 @@
+table d_order_reviews
+	lineageTag: 6147cef2-872a-4ca3-b0b0-9cbf51b1fa13
+
+	column review_id
+		dataType: string
+		lineageTag: 3ec15965-8609-4101-b82b-24ef92e5eae4
+		summarizeBy: none
+		sourceColumn: review_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_id
+		dataType: string
+		lineageTag: 23fcd99d-fe47-4970-a2bf-7cd32ccaf4bc
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_score
+		dataType: int64
+		formatString: 0
+		lineageTag: 47396014-5398-4b5f-b68a-358a0c72b806
+		summarizeBy: sum
+		sourceColumn: review_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_creation_date
+		dataType: dateTime
+		formatString: dd.mm.yyyy
+		lineageTag: 58a7bf91-4983-4a46-b662-3cc683bbc960
+		summarizeBy: none
+		sourceColumn: review_creation_date
+
+		variation Variation
+			isDefault
+			relationship: 0e1e76e1-4d3a-4d08-99c2-4f359a936f8c
+			defaultHierarchy: LocalDateTable_f23a14e4-5cad-4047-bd30-715d8c29dd47.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column review_answer_timestamp
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 11168e28-fbad-4b12-8a56-f1467f8b6a78
+		summarizeBy: none
+		sourceColumn: review_answer_timestamp
+
+		variation Variation
+			isDefault
+			relationship: 38dd327c-1328-4dcf-a202-e6ae9606387d
+			defaultHierarchy: LocalDateTable_ac745437-8a38-42cd-b335-2e7b957b7575.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column response_time = DATEDIFF(d_order_reviews[review_creation_date], d_order_reviews[review_answer_timestamp], DAY)
+		formatString: 0
+		lineageTag: dc5707c9-c11b-4bfe-9512-d7aa1abaa32b
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer ratings' = ```
+			SWITCH(TRUE(), 
+			[review_score] = 1,"Very Poor", 
+			[review_score] = 2,"Poor",
+			[review_score] = 3,"Average",
+			[review_score] = 4,"Good",
+			[review_score] = 5 ,"Excellent",BLANK())
+			
+			```
+		lineageTag: 52d01005-be1b-45d4-a008-668ee281209d
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'd_orders.customer_id'
+		dataType: string
+		lineageTag: 24112a9a-bcb8-4a3b-9824-b37712357fee
+		summarizeBy: none
+		sourceColumn: d_orders.customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column Сustomer_city
+		dataType: string
+		lineageTag: b84834c4-bd5d-42ba-947f-c1ca53f2bd89
+		summarizeBy: none
+		sourceColumn: Сustomer_city
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_order_reviews = m
+		mode: import
+		queryGroup: Active
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\49151\OneDrive\Курс IT\Power BI\Project\Project-20241011T133917Z-001\Project\olist_order_reviews_dataset.csv"),[Delimiter=",", Columns=7, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"review_id", type text}, {"order_id", type text}, {"review_score", Int64.Type}, {"review_comment_title", type text}, {"review_comment_message", type text}, {"review_creation_date", type datetime}, {"review_answer_timestamp", type datetime}}),
+				    #"Sorted Rows" = Table.Sort(#"Changed Type",{{"review_creation_date", Order.Descending}}),
+				    #"Removed Duplicates" = Table.Distinct(#"Sorted Rows", {"order_id"}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Removed Duplicates",{"review_comment_title", "review_comment_message"}),
+				    #"Reordered Columns" = Table.ReorderColumns(#"Removed Columns",{"order_id", "review_id", "review_score", "review_creation_date", "review_answer_timestamp"}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Reordered Columns",{{"review_creation_date", type date}, {"review_answer_timestamp", type date}}),
+				    #"Merged Queries" = Table.NestedJoin(#"Changed Type1", {"order_id"}, d_orders, {"order_id"}, "d_orders", JoinKind.LeftOuter),
+				    #"Expanded d_orders" = Table.ExpandTableColumn(#"Merged Queries", "d_orders", {"customer_id"}, {"d_orders.customer_id"}),
+				    #"Reordered Columns1" = Table.ReorderColumns(#"Expanded d_orders",{"order_id", "review_id", "d_orders.customer_id", "review_score", "review_creation_date", "review_answer_timestamp"}),
+				    #"Merged Queries1" = Table.NestedJoin(#"Reordered Columns1", {"d_orders.customer_id"}, d_customers, {"customer_id"}, "d_customers", JoinKind.LeftOuter),
+				    #"Expanded d_customers" = Table.ExpandTableColumn(#"Merged Queries1", "d_customers", {"customer_id", "customer_zip_code_prefix", "Сustomer_city", "customer_state", "geolocation_lat", "geolocation_lng"}, {"d_customers.customer_id", "d_customers.customer_zip_code_prefix", "d_customers.Сustomer_city", "d_customers.customer_state", "d_customers.geolocation_lat", "d_customers.geolocation_lng"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Expanded d_customers",{{"d_customers.Сustomer_city", "Сustomer_city"}}),
+				    #"Removed Columns1" = Table.RemoveColumns(#"Renamed Columns",{"d_customers.customer_id", "d_customers.customer_zip_code_prefix", "d_customers.customer_state", "d_customers.geolocation_lat", "d_customers.geolocation_lng"})
+				in
+				    #"Removed Columns1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

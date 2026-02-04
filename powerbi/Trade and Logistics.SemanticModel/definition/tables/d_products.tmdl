@@ -1,0 +1,190 @@
+table d_products
+	lineageTag: 71bbd654-00eb-427d-9a4c-ab5b99e3e06c
+
+	column product_id
+		dataType: string
+		lineageTag: 1575bef5-d476-4ea9-a7a4-0c4305f8091d
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_name_lenght
+		dataType: int64
+		formatString: 0
+		lineageTag: 2863cc58-f940-46d2-ab83-293cef51ce6c
+		summarizeBy: none
+		sourceColumn: product_name_lenght
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_description_lenght
+		dataType: int64
+		formatString: 0
+		lineageTag: c1547b83-cf4b-43d7-abda-53aecf8b37f2
+		summarizeBy: none
+		sourceColumn: product_description_lenght
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_photos_qty
+		dataType: int64
+		formatString: 0
+		lineageTag: c76476eb-4031-4f85-9253-1c8d3066edc6
+		summarizeBy: none
+		sourceColumn: product_photos_qty
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_weight_g
+		dataType: int64
+		formatString: 0
+		lineageTag: 467b28d8-6d88-4a10-89b1-c2d3df6020f2
+		summarizeBy: none
+		sourceColumn: product_weight_g
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_length_cm
+		dataType: int64
+		formatString: 0
+		lineageTag: a6c9d4eb-3545-4486-851c-073b26dc5587
+		summarizeBy: none
+		sourceColumn: product_length_cm
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_height_cm
+		dataType: int64
+		formatString: 0
+		lineageTag: f85a0804-1e3f-44dc-bf1b-aa832fa934f9
+		summarizeBy: none
+		sourceColumn: product_height_cm
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_width_cm
+		dataType: int64
+		formatString: 0
+		lineageTag: 38fa29f0-7ca0-41e4-9d86-75e9f39b9cc8
+		summarizeBy: none
+		sourceColumn: product_width_cm
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_category_name
+		dataType: string
+		lineageTag: 43439e56-3b2e-45c3-9dd5-23931b313a94
+		summarizeBy: none
+		sourceColumn: product_category_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_volume_m3
+		dataType: double
+		lineageTag: 6090957a-113e-4017-800f-d745053bd5ec
+		summarizeBy: none
+		sourceColumn: product_volume_m3
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Cargo_volume = ```
+			SWITCH(TRUE(), 
+			[product_volume_m3]<20,"Extra-small cargo", 
+			[product_volume_m3]>=20 && [product_volume_m3]<50,"Small-sized cargo",
+			[product_volume_m3]>=50 && [product_volume_m3]<500,"Medium-sized cargo",
+			[product_volume_m3]>=500 && [product_volume_m3]<1000,"Large-sized cargo",
+			[product_volume_m3]>=1000 ,"Extra-large cargo",BLANK())
+			
+			```
+		lineageTag: 0e6ee62c-8b79-4112-b043-de126ce1bb9f
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category = ```
+			SWITCH(TRUE(), 
+			[product_category_name] IN {"bed_bath_table", "furniture_bedroom", "furniture_decor", "furniture_living_room", "furniture_mattress_and_upholstery", "home_comfort_2", "home_confort", "home_construction", "housewares", "kitchen_dining_laundry_garden_furniture", "home_appliances", "home_appliances_2", "small_appliances_home_oven_and_coffee"}, "Home & Furniture", 
+			[product_category_name] IN {"computers", "computers_accessories", "consoles_games", "electronics", "fixed_telephony", "telephony", "tablets_printing_image"},"Electronics & Technology",
+			[product_category_name] IN {"fashio_female_clothing", "fashion_bags_accessories", "fashion_childrens_clothes", "fashion_male_clothing", "fashion_shoes", "fashion_sport", "fashion_underwear_beach", "watches_gifts", "cool_stuff", "luggage_accessories"}, "Fashion & Accessories",
+			[product_category_name] IN {"health_beauty", "diapers_and_hygiene", "perfumery"}, "Health & Beauty",
+			[product_category_name] IN {"toys", "baby", "party_supplies", "art", "arts_and_craftmanship"}, "Toys, Hobbies & Baby",
+			[product_category_name] IN {"cds_dvds_musicals", "cine_photo", "dvds_blu_ray", "music", "musical_instruments", "books_general_interest", "audio", "books_imported", "books_technical"}, "Music & Entertainment",
+			[product_category_name] IN {"food", "food_drink", "drinks", "la_cuisine"}, "Food & Drinks",
+			[product_category_name] IN {"construction_tools_construction", "construction_tools_lights", "construction_tools_safety", "costruction_tools_garden", "costruction_tools_tools", "industry_commerce_and_business"}, "Industrial & Construction",
+			[product_category_name] IN {"garden_tools", "pet_shop", "flowers", "cool stuif"}, "Pets & Outdoors",
+			[product_category_name] IN {"agro_industry_and_commerce", "air_conditioning", "office_furniture", "signaling_and_security", "small_appliances", "security_and_services", "market_place", "stationery", "auto", "sports_leisure", "christmas_supplies"} ,"Miscellaneous & Services",
+			[product_category_name] = BLANK(), "Other")
+			```
+		lineageTag: 8c6c5757-33c3-44a5-a9f3-9af0da3bb430
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation __PBI_SemanticLinks = [{"LinkTarget":{"TableName":"d_products","TableItemName":"Category (clusters)","ObjectType":4},"LinkType":"UsedInGroup"}]
+
+	/// Clusters for Category
+	column 'Category (clusters)' = ```
+			VAR __ClusterValue = 
+				LOOKUPVALUE(
+					'ClusterMappingTable'[ClusterId],
+					'ClusterMappingTable'[Category],
+					'd_products'[Category]
+				)
+			
+			RETURN
+				SWITCH(
+					__ClusterValue,
+					BLANK(),
+					BLANK(),
+					CONCATENATE("Cluster", __ClusterValue)
+				)
+			```
+		lineageTag: 68637863-fd22-4530-9f73-3c1b7f5f0ffe
+		summarizeBy: none
+
+		extendedProperty GroupingMetadata =
+				{
+				  "version": 0,
+				  "groupedColumns": [
+				    {
+				      "Column": {
+				        "Expression": {
+				          "SourceRef": {
+				            "Entity": "d_products"
+				          }
+				        },
+				        "Property": "Category"
+				      }
+				    }
+				  ]
+				}
+
+		annotation GroupingDesignState = {"Version":0,"Sources":[{"Name":"d","Entity":"d_products"}],"GroupedColumns":[{"Column":{"Expression":{"SourceRef":{"Source":"d"}},"Property":"Category"}}],"PartitionTable":{"Definition":{"TableDefinition":{"Version":2,"From":[{"Name":"d","Entity":"d_products"},{"Name":"_","Entity":"_m"},{"Name":"subquery","Type":2,"Expression":{"Subquery":{"Query":{"Version":2,"From":[{"Name":"d1","Entity":"d_products"},{"Name":"_1","Entity":"_m"},{"Name":"s1","Entity":"Select_value"},{"Name":"c1","Entity":"Calendar"}],"Where":[{"Condition":{"Comparison":{"Left":{"Column":{"Expression":{"SourceRef":{"Source":"d1"}},"Property":"Category"}},"Right":{"AnyValue":{"DefaultValueOverridesAncestors":true}},"ComparisonKind":0}}},{"Condition":{"In":{"Expressions":[{"Column":{"Expression":{"SourceRef":{"Source":"s1"}},"Property":"Select_value Fields"}}],"Values":[[{"Literal":{"Value":"'''_m''[Gross Merchandise Value]'"}}]]}}},{"Condition":{"In":{"Expressions":[{"Column":{"Expression":{"SourceRef":{"Source":"c1"}},"Property":"Year"}}],"Values":[[{"Literal":{"Value":"2018L"}}]]}}}],"OrderBy":[{"Expression":{"Measure":{"Expression":{"SourceRef":{"Source":"_1"}},"Property":"Gross Merchandise Value"}},"Direction":2}],"Select":[{"Column":{"Expression":{"SourceRef":{"Source":"d1"}},"Property":"Category"},"Name":"field"}],"GroupBy":[],"Top":5}}}},{"Name":"s","Entity":"Select_value"},{"Name":"c","Entity":"Calendar"}],"Where":[{"Condition":{"In":{"Expressions":[{"Column":{"Expression":{"SourceRef":{"Source":"d"}},"Property":"Category"}}],"Table":{"SourceRef":{"Source":"subquery"}}}}},{"Condition":{"In":{"Expressions":[{"Column":{"Expression":{"SourceRef":{"Source":"s"}},"Property":"Select_value Fields"}}],"Values":[[{"Literal":{"Value":"'''_m''[Gross Merchandise Value]'"}}]]}}},{"Condition":{"In":{"Expressions":[{"Column":{"Expression":{"SourceRef":{"Source":"c"}},"Property":"Year"}}],"Values":[[{"Literal":{"Value":"2018L"}}]]}}}],"OrderBy":[],"Select":[{"Column":{"Expression":{"TransformTableRef":{"Source":"output0"}},"Property":"d_products.Category"},"Name":"d_products.Category"},{"Column":{"Expression":{"TransformTableRef":{"Source":"output0"}},"Property":"clusterId"},"Name":"clusterId"}],"GroupBy":[],"Transform":[{"Name":"KMeansClustering","Algorithm":"KMeansClustering","Input":{"Parameters":[{"Literal":{"Value":"-1L"},"Name":"NumberOfClusters"}],"Table":{"Name":"input0","Columns":[{"Role":"Item","Expression":{"Column":{"Expression":{"SourceRef":{"Source":"d"}},"Property":"Category"},"Name":"d_products.Category"}},{"Role":"Attribute","Expression":{"Measure":{"Expression":{"SourceRef":{"Source":"_"}},"Property":"Gross Merchandise Value"},"Name":"_m.Gross Merchandise Value"}}]}},"Output":{"Table":{"Name":"output0","Columns":[{"Expression":{"Column":{"Expression":{"TransformTableRef":{"Source":"input0"}},"Property":"d_products.Category"},"Name":"d_products.Category"}},{"Role":"Values","Expression":{"TransformOutputRoleRef":{"Role":"ClusterId"},"Name":"clusterId"}}]}}}]},"ItemIdColumns":["d_products.Category"],"PartitionIdColumn":"clusterId","Partitions":[{"PartitionIds":[{"Literal":{"Value":"null"}}]}],"DefaultPartitionPrefix":"Cluster"},"Result":{"TableName":"ClusterMappingTable","PartitionIdColumn":"ClusterId","ItemIdMappings":[[{"PartitionTableColumn":{"Column":{"Expression":{"SourceRef":{"Entity":"ClusterMappingTable"}},"Property":"Category"}},"SourceTableColumn":{"Column":{"Expression":{"SourceRef":{"Entity":"d_products"}},"Property":"Category"}}}]]}}}
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_products = m
+		mode: import
+		queryGroup: Active
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\49151\OneDrive\Курс IT\Power BI\Project\Project-20241011T133917Z-001\Project\olist_products_dataset.csv"),[Delimiter=",", Columns=9, Encoding=1251, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"product_id", type text}, {"product_category_name", type text}, {"product_name_lenght", Int64.Type}, {"product_description_lenght", Int64.Type}, {"product_photos_qty", Int64.Type}, {"product_weight_g", Int64.Type}, {"product_length_cm", Int64.Type}, {"product_height_cm", Int64.Type}, {"product_width_cm", Int64.Type}}),
+				    #"Merged Queries" = Table.NestedJoin(#"Changed Type", {"product_category_name"}, product_category_name_translation, {"product_category_name"}, "product_category_name_translation", JoinKind.LeftOuter),
+				    #"Expanded product_category_name_translation" = Table.ExpandTableColumn(#"Merged Queries", "product_category_name_translation", {"product_category_name_english"}, {"product_category_name_translation.product_category_name_english"}),
+				    #"Reordered Columns" = Table.ReorderColumns(#"Expanded product_category_name_translation",{"product_id", "product_category_name", "product_category_name_translation.product_category_name_english", "product_name_lenght", "product_description_lenght", "product_photos_qty", "product_weight_g", "product_length_cm", "product_height_cm", "product_width_cm"}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Reordered Columns",{"product_category_name"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"product_category_name_translation.product_category_name_english", "product_category_name"}}),
+				    #"Added Custom" = Table.AddColumn(#"Renamed Columns", "product_volume_m3", each ([product_length_cm] * [product_height_cm] * [product_width_cm])/100),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom",{{"product_volume_m3", type number}})
+				in
+				    #"Changed Type1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

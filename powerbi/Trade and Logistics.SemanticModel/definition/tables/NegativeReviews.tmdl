@@ -1,0 +1,102 @@
+table NegativeReviews
+	lineageTag: 6836211f-828a-42da-a7c7-dde3b2bfc3a0
+
+	column review_id
+		lineageTag: f3f437fe-eb84-435c-81c3-b2731eb72a3f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: d_order_reviews[review_id]
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_id
+		lineageTag: ff345609-6e46-41f7-9fc2-643879d54850
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: d_order_reviews[order_id]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Very poor rating'
+		formatString: 0
+		lineageTag: d0b4561b-77af-44fc-a141-8acc4105d8bf
+		summarizeBy: sum
+		sourceColumn: d_order_reviews[review_score]
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_creation_date
+		formatString: General Date
+		lineageTag: 1898c1a4-fb14-431a-8a7e-c8c22b1f499f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: d_order_reviews[review_creation_date]
+
+		variation Variation
+			isDefault
+			relationship: 9d734a4c-c9ac-4b6f-89f7-b2aadbfa47e6
+			defaultHierarchy: LocalDateTable_a9073833-ae26-4f84-b90d-0292d7262ed8.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_answer_timestamp
+		formatString: General Date
+		lineageTag: 4c1f7986-98f4-4f4d-8319-6082bcc6ed1e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: d_order_reviews[review_answer_timestamp]
+
+		variation Variation
+			isDefault
+			relationship: 2c07b86d-6213-4e99-b5d4-bf2412b0db38
+			defaultHierarchy: LocalDateTable_79d8bcfe-29c5-41d3-8c50-771ac2c55c42.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'response time (days)'
+		formatString: 0
+		lineageTag: 53ec6436-9198-41d3-948c-30810b100284
+		summarizeBy: sum
+		sourceColumn: d_order_reviews[response_time]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer ratings'
+		lineageTag: 579f91b0-a15a-42e7-a167-c350191d81ea
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: d_order_reviews[Customer ratings]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'd_orders.customer_id'
+		lineageTag: 19da6364-c9ec-4274-a0b9-2ee4902e979e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: d_order_reviews[d_orders.customer_id]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Сustomer city'
+		lineageTag: 9c8115b0-c99c-4376-b422-530de0554f41
+		summarizeBy: none
+		sourceColumn: d_order_reviews[Сustomer_city]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition NegativeReviews = calculated
+		mode: import
+		source = ```
+				
+				CALCULATETABLE(
+				    FILTER(
+				        'd_order_reviews',
+				        'd_order_reviews'[review_score] = 1
+				    ),
+				    ALL('d_order_reviews')
+				)
+				
+				```
+
+	annotation PBI_Id = 8b94a2ff127f42f3bb787f92692f1604
+

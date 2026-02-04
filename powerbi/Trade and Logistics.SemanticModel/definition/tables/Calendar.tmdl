@@ -1,0 +1,176 @@
+table Calendar
+	lineageTag: cd9e58ea-1386-415d-8c56-4b5e779a1444
+
+	column Date
+		formatString: dd.mm.yyyy
+		lineageTag: e7112f28-49f6-4a6e-a02e-10a1ebdaff33
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		variation Variation
+			isDefault
+			relationship: 7fdf77b1-8633-4075-84f1-0746aa34c91b
+			defaultHierarchy: LocalDateTable_0134838c-e981-41e1-9a17-017b4fb211a7.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column Month
+		lineageTag: 70b6af91-14e4-4702-a85c-7edfcccdc90f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Month]
+		sortByColumn: 'Month sorting'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation __PBI_SemanticLinks = [{"LinkTarget":{"TableName":"Calendar","TableItemName":"Month (groups)","ObjectType":4},"LinkType":"UsedInGroup"}]
+
+	column 'Week day'
+		lineageTag: 74a073ac-2c2b-4b37-a705-ae47e605ba2b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Week day]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Week number'
+		formatString: 0
+		lineageTag: 4a842bd4-d09b-4ac4-84d0-4625c7bf3d4a
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Week number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month name'
+		lineageTag: 9298dfc2-9779-4358-8a35-b44769c2e9b3
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Month name]
+		sortByColumn: 'Month number'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month number'
+		formatString: 0
+		lineageTag: 4070c6bf-e1e1-4d77-8a39-ff840cee610b
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Month number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		formatString: 0
+		lineageTag: bc828806-9b90-48d7-9af1-c3cf8173bae3
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Year]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation __PBI_SemanticLinks = [{"LinkTarget":{"TableName":"d_products","TableItemName":"Category (clusters)","ObjectType":4},"LinkType":"UsedInGroup"}]
+
+	column 'Month sorting'
+		lineageTag: a36a3456-4f09-4ee1-bea6-71e72fb57e87
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Month sorting]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Day
+		lineageTag: 45a554e5-59d1-4c8f-8d94-4990c7248f89
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Day]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month (groups)' =
+			SWITCH(
+				TRUE,
+				ISBLANK('Calendar'[Month]),
+				"(Blank)",
+				'Calendar'[Month] IN {"September 2016",
+					"October 2016",
+					"November 2016",
+					"December 2016"},
+				"2016",
+				'Calendar'[Month] IN {"January 2017",
+					"February 2017",
+					"March 2017",
+					"April 2017",
+					"May 2017",
+					"June 2017",
+					"July 2017",
+					"August 2017",
+					"September 2017",
+					"October 2017",
+					"November 2017",
+					"December 2017"},
+				"2017",
+				'Calendar'[Month] IN {"January 2018",
+					"February 2018",
+					"March 2018",
+					"April 2018",
+					"May 2018",
+					"June 2018",
+					"July 2018",
+					"August 2018",
+					"September 2018",
+					"October 2018"},
+				"2018",
+				'Calendar'[Month]
+			)
+		lineageTag: 9a3555ca-3c0d-48a8-9eda-4254ab058f42
+		summarizeBy: none
+
+		extendedProperty GroupingMetadata =
+				{
+				  "version": 0,
+				  "groupedColumns": [
+				    {
+				      "Column": {
+				        "Expression": {
+				          "SourceRef": {
+				            "Entity": "Calendar"
+				          }
+				        },
+				        "Property": "Month"
+				      }
+				    }
+				  ]
+				}
+
+		annotation GroupingDesignState = {"Version":0,"Sources":[{"Name":"c","Entity":"Calendar"}],"GroupedColumns":[{"Column":{"Expression":{"SourceRef":{"Source":"c"}},"Property":"Month"}}],"GroupItems":[{"DisplayName":"(Blank)","BlankDefaultPlaceholder":true},{"DisplayName":"2016","Expression":{"In":{"Expressions":[{"Column":{"Expression":{"SourceRef":{"Source":"c"}},"Property":"Month"}}],"Values":[[{"Literal":{"Value":"'September 2016'"}}],[{"Literal":{"Value":"'October 2016'"}}],[{"Literal":{"Value":"'November 2016'"}}],[{"Literal":{"Value":"'December 2016'"}}]]}}},{"DisplayName":"2017","Expression":{"In":{"Expressions":[{"Column":{"Expression":{"SourceRef":{"Source":"c"}},"Property":"Month"}}],"Values":[[{"Literal":{"Value":"'January 2017'"}}],[{"Literal":{"Value":"'February 2017'"}}],[{"Literal":{"Value":"'March 2017'"}}],[{"Literal":{"Value":"'April 2017'"}}],[{"Literal":{"Value":"'May 2017'"}}],[{"Literal":{"Value":"'June 2017'"}}],[{"Literal":{"Value":"'July 2017'"}}],[{"Literal":{"Value":"'August 2017'"}}],[{"Literal":{"Value":"'September 2017'"}}],[{"Literal":{"Value":"'October 2017'"}}],[{"Literal":{"Value":"'November 2017'"}}],[{"Literal":{"Value":"'December 2017'"}}]]}}},{"DisplayName":"2018","Expression":{"In":{"Expressions":[{"Column":{"Expression":{"SourceRef":{"Source":"c"}},"Property":"Month"}}],"Values":[[{"Literal":{"Value":"'January 2018'"}}],[{"Literal":{"Value":"'February 2018'"}}],[{"Literal":{"Value":"'March 2018'"}}],[{"Literal":{"Value":"'April 2018'"}}],[{"Literal":{"Value":"'May 2018'"}}],[{"Literal":{"Value":"'June 2018'"}}],[{"Literal":{"Value":"'July 2018'"}}],[{"Literal":{"Value":"'August 2018'"}}],[{"Literal":{"Value":"'September 2018'"}}],[{"Literal":{"Value":"'October 2018'"}}]]}}}]}
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Calendar = calculated
+		mode: import
+		source = ```
+				
+				ADDCOLUMNS(
+				    CALENDAR(MIN('d_orders'[order_purchase_timestamp]), MAX('d_orders'[order_delivered_customer_date])),
+				    "Day", FORMAT([Date], "dd.MM.YYYY"),
+				    "Month", FORMAT([Date], "MMMM YYYY"),
+				    "Week day", FORMAT([Date], "dddd"),
+				    "Week number", WEEKNUM([Date], 2),
+				    "Month name", FORMAT([Date], "MMM"),
+				    "Month number", MONTH([Date]),
+				    "Year", YEAR([Date]),
+				    "Month sorting", FORMAT([Date], "YYYYMM")
+				)
+				
+				```
+
+	annotation PBI_Id = 844c667bee274412b03e1099c9cdd901
+
+	annotation __PBI_SemanticLinks = [{"LinkTarget":{"TableName":"d_products","TableItemName":"Category (clusters)","ObjectType":4},"LinkType":"UsedInGroup"}]
+

@@ -1,0 +1,150 @@
+table d_orders
+	lineageTag: c14e65d3-5733-4250-938c-37a545144379
+
+	column order_id
+		dataType: string
+		lineageTag: 51cd95e8-e2ce-462d-9891-9def22d5cea1
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_id
+		dataType: string
+		lineageTag: 1cca8bde-4af6-47c0-ba45-f7f093d18db8
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_status
+		dataType: string
+		lineageTag: 2c179427-75e5-4661-a054-836dea30493b
+		summarizeBy: none
+		sourceColumn: order_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_purchase_timestamp
+		dataType: dateTime
+		formatString: dd.mm.yyyy
+		lineageTag: d8784a30-baed-4a05-9153-fa10fcb4e1b2
+		summarizeBy: none
+		sourceColumn: order_purchase_timestamp
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column order_approved_at
+		dataType: dateTime
+		formatString: dd.mm.yyyy
+		lineageTag: a50453c5-8237-4a21-ac71-e272710caf8c
+		summarizeBy: none
+		sourceColumn: order_approved_at
+
+		variation Variation
+			isDefault
+			relationship: 4918d994-3de5-4851-915c-a07247a871fd
+			defaultHierarchy: LocalDateTable_4cd33764-778d-4f0d-b9cd-802a558a572a.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column order_delivered_carrier_date
+		dataType: dateTime
+		formatString: dd.mm.yyyy
+		lineageTag: 7b673623-9753-4b7a-a0de-80a7b2b22cb5
+		summarizeBy: none
+		sourceColumn: order_delivered_carrier_date
+
+		variation Variation
+			isDefault
+			relationship: 46f29698-2a9f-4dbf-988e-3fc32c161608
+			defaultHierarchy: LocalDateTable_406d3324-885e-4790-bba8-bd480b5d7d9f.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column order_delivered_customer_date
+		dataType: dateTime
+		formatString: dd.mm.yyyy
+		lineageTag: 3d2a78db-cc46-43d6-9566-4a2463706a4c
+		summarizeBy: none
+		sourceColumn: order_delivered_customer_date
+
+		variation Variation
+			isDefault
+			relationship: 8a4d2c73-9cbf-4e6e-99d4-6270134fbae1
+			defaultHierarchy: LocalDateTable_3ea58a9b-c06a-4603-9a00-be59c4e3e85d.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column order_estimated_delivery_date
+		dataType: dateTime
+		formatString: dd.mm.yyyy
+		lineageTag: afc643c3-821d-4340-bd96-852ab7ebc839
+		summarizeBy: none
+		sourceColumn: order_estimated_delivery_date
+
+		variation Variation
+			isDefault
+			relationship: 007695bd-cdcc-4213-bdf7-24c9d9e5a52c
+			defaultHierarchy: LocalDateTable_7f0a87ce-8465-4769-8b17-635690f38f0a.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Delivery Status' = IF(d_orders[order_delivered_customer_date] <= d_orders[order_estimated_delivery_date], "On Time", "Late")
+		lineageTag: 5c770279-3d01-4e05-9eb4-4529d2e1b84f
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Processing Time' = DATEDIFF(d_orders[order_purchase_timestamp], d_orders[order_approved_at], HOUR)
+		formatString: 0
+		lineageTag: 80e0e558-5226-45bd-a335-94e5d3cf964f
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Orders Cycle Time' = DATEDIFF(d_orders[order_purchase_timestamp], d_orders[order_delivered_customer_date], DAY)
+		formatString: 0
+		lineageTag: 5fc9af6e-7764-463e-b051-4c22940a5445
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition d_orders = m
+		mode: import
+		queryGroup: Active
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\49151\OneDrive\Курс IT\Power BI\Project\Project-20241011T133917Z-001\Project\olist_orders_dataset.csv"),[Delimiter=",", Columns=8, Encoding=1251, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"order_id", type text}, {"customer_id", type text}, {"order_status", type text}, {"order_purchase_timestamp", type datetime}, {"order_approved_at", type datetime}, {"order_delivered_carrier_date", type datetime}, {"order_delivered_customer_date", type datetime}, {"order_estimated_delivery_date", type datetime}}),
+				    #"Sorted Rows" = Table.Sort(#"Changed Type",{{"order_purchase_timestamp", Order.Descending}}),
+				    #"Sorted Rows1" = Table.Sort(#"Sorted Rows",{{"order_purchase_timestamp", Order.Ascending}}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Sorted Rows1",{{"order_purchase_timestamp", type date}, {"order_approved_at", type date}, {"order_delivered_carrier_date", type date}, {"order_delivered_customer_date", type date}, {"order_estimated_delivery_date", type date}})
+				in
+				    #"Changed Type1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+
