@@ -130,7 +130,7 @@ Analytical Insights:
 
 ---
 
-**📁 Repository:** Full PBIP project, sample data, demo GIFs
+**📁 Repository:** Full PBIP & PBIX project, sample data, demo GIFs
 
 ---
 
