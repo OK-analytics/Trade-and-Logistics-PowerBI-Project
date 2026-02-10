@@ -7,6 +7,13 @@ A comprehensive Power BI project analyzing the full lifecycle of a retail busine
 
 The goal of this project was to transform raw transactional data into a strategic tool for decision-making. I developed a 4-page interactive dashboard that covers key business verticals, allowing stakeholders to identify bottlenecks and growth opportunities.
 
+### Star Schema (12+ tables post-ETL)
+
+<img src="images/model.png" width="100%" alt="Model">
+
+
+**How did I bridge Cities ↔ Orders? 👀**  
+**Download PBIX for full DAX + relationships**
 
 ### ⚡Key Performance Indicators (KPIs) & Business Insights
 
